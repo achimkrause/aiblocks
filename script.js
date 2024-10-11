@@ -22,7 +22,7 @@ class Game{
     this.gridsize = 80;
     this.offX = 0;
     this.offY = 0;
-    this.movesize = 12;
+    this.movesize = 20;
     this.manual=true;
     let canvas = document.getElementById("canvas");
     canvas.addEventListener('click', (e) => this.click(e));
