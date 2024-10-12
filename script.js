@@ -128,7 +128,6 @@ class Game{
       console.log('locked')
       return;
     }
-    this.hint = null;
     let canvas = document.getElementById("canvas");
     let rect = canvas.getBoundingClientRect();
     let x = event.clientX - rect.left;
@@ -152,6 +151,7 @@ class Game{
       }
       if(cornerX <= x && x <= cornerX + width && cornerY <= y && y <= cornerY+height){
         this.position.move(move);
+        this.hint = null;
         this.manual=false;
         console.log('sending message')
         ai_worker.postMessage({position:this.position, query: 'move'});
