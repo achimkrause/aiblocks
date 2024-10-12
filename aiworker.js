@@ -2,11 +2,14 @@ importScripts('./position.js','https://cdn.jsdelivr.net/npm/onnxruntime-web/dist
 ort.env.wasm.wasmPaths = 'https://cdn.jsdelivr.net/npm/onnxruntime-web/dist/';
 
 self.onmessage = function(e){
-  console.log('position received');
-  console.log(e)
   let position = new Position()
   position.set(e.data.position);
-  ai_move(position,0.5).then((move)=> self.postMessage(move));
+  if(e.data.query == 'move'){
+    ai_move(position,0.5).then((move)=> self.postMessage(move));
+  }
+  else if(e.data.query == 'hint'){
+    ai_policy(position).then((policy)=> self.postMessage(policy));
+  }
 }
 
 
@@ -44,7 +47,6 @@ let model={
 }
 
 model.init();
-self.postMessage("ready");
 
 const discovery_constant=1.4;
 
@@ -104,13 +106,17 @@ class MCTS{
   }
 }
 
-async function ai_move(position,temperature){
+async function ai_policy(position){
   let mcts = new MCTS(position.copy());
   for(let n=0; n<500; n++){
     await mcts.visit();
   }
   let policy = mcts.posterior_policy();
-  
+  return policy; 
+}
+
+async function ai_move(position,temperature){
+  let policy = await ai_policy(position);
   let best_n=null;
   let best_pol=null;
   for(let n=0; n<policy.length; n++){
@@ -144,4 +150,3 @@ async function ai_move(position,temperature){
   console.log(movestr);
   return move;
 }
-
